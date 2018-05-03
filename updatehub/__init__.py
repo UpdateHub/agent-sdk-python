@@ -1,3 +1,5 @@
+# Copyright (C) 2018 O.S. Systems Software LTDA.
+
 import io
 import os
 import socket
