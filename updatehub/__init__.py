@@ -3,12 +3,11 @@
 import io
 import os
 import socket
+import threading
 
 
 from enum import Enum
 from enum import unique
-
-import threading
 
 
 @unique
