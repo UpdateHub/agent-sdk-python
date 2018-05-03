@@ -6,7 +6,7 @@ from updatehub import get_version
 
 
 setup(
-    name='updatehubagentsdk',
+    name='updatehub-agent-sdk',
     description="UpdateHub's agent SDK for Python",
     keywords='industrial-linux embedded-linux embedded firmware-updates linux update-service',  # nopep8
     version=get_version(),
