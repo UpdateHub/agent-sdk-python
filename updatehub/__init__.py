@@ -19,13 +19,13 @@ def get_version():
     return __version__
 
 
-@unique
+@unique  # pylint: disable=too-few-public-methods
 class Action(Enum):
     ENTER = "enter"
     LEAVE = "leave"
 
 
-@unique
+@unique  # pylint: disable=too-few-public-methods
 class State(Enum):
     IDLE = "idle"
     POLL = "poll"

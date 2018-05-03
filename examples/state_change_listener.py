@@ -1,5 +1,7 @@
 # Copyright (C) 2018 O.S. Systems Software LTDA.
 
+from __future__ import print_function
+
 import updatehub
 
 
