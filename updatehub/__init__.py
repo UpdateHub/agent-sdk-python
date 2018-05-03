@@ -37,7 +37,7 @@ class State(Enum):
     REBOOTING = "rebooting"
 
 
-class StateCommand:
+class StateCommand(object):
     def __init__(self, connection):
         self._connection = connection
 
@@ -60,7 +60,7 @@ class StateError(Exception):
     pass
 
 
-class StateChangeListener():
+class StateChangeListener(object):
     SDK_TRIGGER_FILENAME = ("/usr/share/updatehub/state-change-callbacks.d/"
                             "10-updatehub-sdk-statechange-trigger")
     SOCKET_PATH = "/run/updatehub-statechange.sock"
