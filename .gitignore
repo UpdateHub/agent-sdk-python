@@ -1,9 +1,11 @@
+*~
 .cache/
 .coverage
 .tox/
 __pycache__
 build/
 dist/
-updatehubagentsdk.egg-info/
+updatehub_agent_sdk.egg-info/
 test-report.xml
 *.pyc
+coverage.xml
