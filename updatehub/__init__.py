@@ -40,14 +40,17 @@ class State(Enum):
 
 
 class StateCommand(object):
+    CANCEL_MESSAGE = "cancel"
+    TRY_AGAIN_MESSAGE = "try_again"
+
     def __init__(self, connection):
         self._connection = connection
 
     def cancel(self):
-        self._send_message(StateChangeListener.CANCEL_MESSAGE)
+        self._send_message(StateCommand.CANCEL_MESSAGE)
 
     def try_again(self, delay):
-        message = StateChangeListener.TRY_AGAIN_MESSAGE + " " + str(delay)
+        message = StateCommand.TRY_AGAIN_MESSAGE + " " + str(delay)
         self._send_message(message)
 
     def _send_message(self, message):
@@ -66,8 +69,6 @@ class StateChangeListener(object):
     SDK_TRIGGER_FILENAME = ("/usr/share/updatehub/state-change-callbacks.d/"
                             "10-updatehub-sdk-statechange-trigger")
     SOCKET_PATH = "/run/updatehub-statechange.sock"
-    CANCEL_MESSAGE = "cancel"
-    TRY_AGAIN_MESSAGE = "try_again"
 
     def __init__(self):
         self.error_handlers = []
