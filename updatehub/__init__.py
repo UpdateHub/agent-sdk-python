@@ -12,7 +12,7 @@ from enum import Enum
 from enum import unique
 
 
-__version__ = '0.0.1'
+__version__ = '0.0.2'
 
 
 def get_version():
