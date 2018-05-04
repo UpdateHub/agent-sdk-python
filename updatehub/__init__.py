@@ -50,7 +50,8 @@ class State(Enum):
            update on the expected schedule.
     :PROBE: triggered when the agent is probing the server for a new update.
     :DOWNLOADING: triggered when the agent is downloading a new update.
-    :DOWNLOADED: triggered when the agent has finished downloading a new update.
+    :DOWNLOADED: triggered when the agent has finished downloading a new
+                 update.
     :INSTALLING: triggered when the agent is installing a new update.
     :INSTALLED: triggered when the agent has finished installing a new update.
     :REBOOTING: triggered when the agent is rebooting the device.
@@ -136,8 +137,8 @@ class StateChangeListener(object):
     methods.
 
     The listener uses a thread to monitor the agent. On each received message
-    the listener check the message against every registered callback, triggering
-    it when it matches the state and the action associated with the
+    the listener check the message against every registered callback,
+    triggering it when it matches the state and the action associated with the
     callback.
 
     Keep in mind that this means that the callback must be ready to act out of
