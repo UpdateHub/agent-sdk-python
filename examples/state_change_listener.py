@@ -7,12 +7,16 @@ import updatehub
 
 def callback(action, state, command):
     print("CALLBACK: " + action + " " + state)
+    print("Canceling the command...")
     command.cancel()
+    print("Done!")
 
 
 def error_callback(error_message, command):
     print("ERROR: " + error_message)
+    print("Sending the retry in 10 seconds command...")
     command.try_again(10)
+    print("Done!")
 
 
 def main():
