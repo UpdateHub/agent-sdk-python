@@ -70,6 +70,28 @@ class StateChangeListener(object):
                             "10-updatehub-sdk-statechange-trigger")
     SOCKET_PATH = "/run/updatehub-statechange.sock"
 
+    @classmethod
+    def _get_state(cls, line):
+        parts = line.split(' ')
+
+        if parts[0] == "error":
+            raise StateError(" ".join(parts[1:]))
+
+        if len(parts) < 2:
+            raise MalformedState()
+
+        return parts[0], parts[1]
+
+    @classmethod
+    def _readline(cls, conn):
+        buff = io.BytesIO()
+        while True:
+            data = conn.recv(16)
+            buff.write(data)
+            if b'\n' in data:
+                break
+        return buff.getvalue().splitlines()[0].decode("utf-8")
+
     def __init__(self):
         self.error_handlers = []
         self.listeners = {}
@@ -94,27 +116,10 @@ class StateChangeListener(object):
         self.running = True
         self.thread.start()
 
-    @classmethod
-    def _get_state(cls, line):
-        parts = line.split(' ')
-
-        if parts[0] == "error":
-            raise StateError(" ".join(parts[1:]))
-
-        if len(parts) < 2:
-            raise MalformedState()
-
-        return parts[0], parts[1]
-
-    @classmethod
-    def _readline(cls, conn):
-        buff = io.BytesIO()
-        while True:
-            data = conn.recv(16)
-            buff.write(data)
-            if b'\n' in data:
-                break
-        return buff.getvalue().splitlines()[0].decode("utf-8")
+    def stop(self):
+        self.running = False
+        self.sock.close()
+        self.thread.join()
 
     def _loop(self):
         while self.running:
@@ -132,11 +137,6 @@ class StateChangeListener(object):
                 raise exception
             finally:
                 self.sock.close()
-
-    def stop(self):
-        self.running = False
-        self.sock.close()
-        self.thread.join()
 
     def _wait_for_state(self):
         while True:
