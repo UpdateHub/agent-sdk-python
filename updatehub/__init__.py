@@ -46,8 +46,8 @@ class StateCommand(object):
     def cancel(self):
         self._send_message(StateChangeListener.CANCEL_MESSAGE)
 
-    def try_again(self, seconds):
-        message = StateChangeListener.TRY_AGAIN_MESSAGE + " " + str(seconds)
+    def try_again(self, delay):
+        message = StateChangeListener.TRY_AGAIN_MESSAGE + " " + str(delay)
         self._send_message(message)
 
     def _send_message(self, message):
