@@ -16,5 +16,6 @@ setup(
     author_email='contato@ossystems.com.br',
     url='http://www.ossystems.com.br',
     license='MIT',
+    data_files = [("", ["LICENSE"])],
     zip_safe=False,
 )
