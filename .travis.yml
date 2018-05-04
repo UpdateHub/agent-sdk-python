@@ -6,7 +6,7 @@ python:
   - 3.5
   - 3.6
 
-install: pip install tox python-coveralls
+install: pip install tox python-coveralls -r requirements-$(echo py$TRAVIS_PYTHON_VERSION | tr -d .).txt
 
 script:
   - tox -e $(echo py$TRAVIS_PYTHON_VERSION | tr -d .)
