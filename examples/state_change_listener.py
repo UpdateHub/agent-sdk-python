@@ -1,7 +1,7 @@
 # Copyright (C) 2018 O.S. Systems Software LTDA.
 """
-Sample script that cancels the update download action after receiving the "enter
-download" state.
+Sample script that cancels the update download action after receiving the
+"enter download" state.
 """
 
 from __future__ import print_function
