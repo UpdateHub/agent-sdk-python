@@ -34,9 +34,9 @@ class State(Enum):
     DOWNLOADED = "downloaded"
     INSTALLING = "installing"
     INSTALLED = "installed"
+    REBOOTING = "rebooting"
     EXIT = "exit"
     ERROR = "error"
-    REBOOTING = "rebooting"
 
 
 class StateCommand(object):
