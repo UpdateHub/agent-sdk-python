@@ -234,7 +234,9 @@ class StateChangeListener(object):
         close the Unix socket and wait for the thread to finish execution.
         """
         self.running = False
-        self.sock.close()
+        client = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        client.connect(StateChangeListener.SOCKET_PATH)
+        client.close()
         if threading.current_thread() != self.thread:
             self.thread.join()
 
@@ -243,13 +245,10 @@ class StateChangeListener(object):
             try:
                 self._connect()
                 self._wait_for_state()
-            except (OSError, socket.error) as exception:
-                if self.running is False and exception.errno == 9:
-                    pass
-                else:
-                    self.running = False
-                    raise exception
+            except StopException as exception:
+                pass
             except Exception as exception:
+                print(exception)
                 self.running = False
                 raise exception
             finally:
@@ -260,6 +259,8 @@ class StateChangeListener(object):
             conn = None
             try:
                 conn = self.sock.accept()[0]
+                if not self.running:
+                    break
                 line = self._readline(conn)
                 action, state = self._get_state(line)
                 self._emit(action, state, conn)
