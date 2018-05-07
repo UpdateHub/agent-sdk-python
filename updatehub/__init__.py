@@ -235,7 +235,8 @@ class StateChangeListener(object):
         """
         self.running = False
         self.sock.close()
-        self.thread.join()
+        if threading.current_thread() != self.thread:
+            self.thread.join()
 
     def _loop(self):
         while self.running:
