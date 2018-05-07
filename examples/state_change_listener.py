@@ -7,6 +7,7 @@ Sample script that cancels the update download action after receiving the
 from __future__ import print_function
 
 import updatehub
+import time
 
 
 def callback(action, state, command):
@@ -42,6 +43,8 @@ def main():
 
     scl.start()
 
+    while True:
+        time.sleep(1)
 
 if __name__ == '__main__':
     main()
