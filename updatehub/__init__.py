@@ -245,8 +245,6 @@ class StateChangeListener(object):
             try:
                 self._connect()
                 self._wait_for_state()
-            except StopException as exception:
-                pass
             except Exception as exception:
                 print(exception)
                 self.running = False
