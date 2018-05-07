@@ -16,6 +16,8 @@ setup(
     author_email='contato@ossystems.com.br',
     url='http://www.ossystems.com.br',
     license='MIT',
-    data_files=[("", ["LICENSE"])],
+    classifiers=[
+        "License :: OSI Approved :: MIT License",
+        ],
     zip_safe=False,
 )
