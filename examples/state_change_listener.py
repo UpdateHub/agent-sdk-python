@@ -7,7 +7,16 @@ Sample script that cancels the update download action after receiving the
 from __future__ import print_function
 
 import updatehub
+import signal
+import sys
 import time
+
+
+scl = updatehub.StateChangeListener()
+
+def signal_handler(signal, frame):
+    scl.stop()
+    sys.exit(0)
 
 
 def callback(action, state, command):
@@ -35,7 +44,9 @@ def main():
     Main method. Instantiates a StateChangeListener, adds callbacks to the
     "enter download" state and the error state and then starts the listener.
     """
-    scl = updatehub.StateChangeListener()
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGQUIT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
     scl.on_state_change(updatehub.Action.ENTER,
                         updatehub.State.DOWNLOADING,
                         callback)
