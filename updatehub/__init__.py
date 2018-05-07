@@ -243,7 +243,7 @@ class StateChangeListener(object):
             try:
                 self._connect()
                 self._wait_for_state()
-            except OSError as exception:
+            except (OSError, socket.error) as exception:
                 if self.running is False and exception.errno == 9:
                     pass
                 else:
