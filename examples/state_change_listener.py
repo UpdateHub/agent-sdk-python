@@ -10,10 +10,10 @@ import signal
 import sys
 import time
 
-import updatehub
+import updatehub.listener
 
 
-SCL = updatehub.StateChangeListener()
+SCL = updatehub.listener.StateChangeListener()
 
 
 def signal_handler(*args):  # pylint: disable=unused-argument
@@ -49,8 +49,8 @@ def main():
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGQUIT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
-    SCL.on_state_change(updatehub.Action.ENTER,
-                        updatehub.State.DOWNLOADING,
+    SCL.on_state_change(updatehub.listener.Action.ENTER,
+                        updatehub.listener.State.DOWNLOADING,
                         callback)
     SCL.on_error(error_callback)
 
