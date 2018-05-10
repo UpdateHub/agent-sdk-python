@@ -103,4 +103,4 @@ class Api(object):
         except AttributeError:
             return_response = response_body
 
-        return return_response
+        return json.loads(return_response)
