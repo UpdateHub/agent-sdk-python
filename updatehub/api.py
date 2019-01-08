@@ -62,13 +62,15 @@ class Api(object):
         """
         return self._request('GET', self.__class__.LOG_PATH)
 
-    def probe(self, host=None):
+    def probe(self, host=None, ignore_probe_asap=False):
         """
         Initiate a probe looking for a new update.
         """
-        data = None
+        data = {}
         if host is not None:
-            data = {"server-address": host}
+            data["server-address"] = host
+        if ignore_probe_asap is not False:
+            data["ignore-probe-asap"] = ignore_probe_asap
         return self._request('POST', self.__class__.PROBE_PATH, data)
 
     def _get_uri(self, path):
