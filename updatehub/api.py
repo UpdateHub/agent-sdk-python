@@ -44,6 +44,18 @@ class Api(object):
     URL to the agent API.
     """
 
+    def set_url(self, url):
+        """
+        Set a different URL than default.
+        """
+        p_url = urlparse(url)
+        if not p_url.netloc:
+            p_url = urlparse('http://'+url)
+        self.__class__.SERVER_URL = "{scheme}://{hostname}:{port}"\
+            .format(scheme=p_url.scheme,
+                    hostname=p_url.hostname,
+                    port=p_url.port)
+
     def abort_download(self):
         """
         Abort a currently executing download.
