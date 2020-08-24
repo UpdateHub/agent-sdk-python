@@ -1,6 +1,6 @@
 # updatehub agent SDK for Python
 
-[![Build Status](https://travis-ci.org/updatehub/agent-sdk-python.svg?branch=master)](https://travis-ci.org/updatehub/agent-sdk-python)
+[![CI](https://github.com/UpdateHub/agent-sdk-python/workflows/CI/badge.svg?branch=master)](https://github.com/UpdateHub/agent-sdk-python/actions?query=branch%3Amaster)
 
 The updatehub agent SDK for Python provides a set of classes to enable programs
 written in Python to interact with the updatehub agent.
