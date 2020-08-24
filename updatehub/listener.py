@@ -7,9 +7,9 @@ from __future__ import print_function
 
 import io
 import os
+import sys
 import socket
 import threading
-
 
 from enum import Enum
 from enum import unique
@@ -57,7 +57,7 @@ class State(Enum):
     ERROR = "error"
 
 
-class StateCommand(object):
+class StateCommand:
     """
     A command class whose objects can be used to send commands back to the
     agent.
@@ -107,17 +107,15 @@ class MalformedState(Exception):
     Exception class raised on errors of the communication protocol on the
     socket.
     """
-    pass
 
 
 class StateError(Exception):
     """
     Exception class raised when receiving errors from the agent execution.
     """
-    pass
 
 
-class StateChangeListener(object):
+class StateChangeListener:
     """
     Listener class for the agent. Objects from this class monitor a Unix socket
     that will receive data from the agent, and triggers registered callbacks
@@ -210,7 +208,7 @@ class StateChangeListener(object):
         """
         if not os.path.isfile(StateChangeListener.SDK_TRIGGER_FILENAME):
             print("updatehub-sdk-statechange-trigger not found!")
-            exit(1)
+            sys.exit()
 
         self.running = True
         self.thread.start()

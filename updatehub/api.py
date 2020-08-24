@@ -18,7 +18,7 @@ except ImportError:
 import json
 
 
-class Api(object):
+class Api:
     """
     Api class used to access the agent API. Must be executed on the host that
     is running the agent.
