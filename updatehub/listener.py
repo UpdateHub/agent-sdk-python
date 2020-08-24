@@ -3,28 +3,14 @@
 Use this package to be notified of changes on the current state of the
 updatehub agent by registering callbacks.
 """
-from __future__ import print_function
 
 import io
 import os
-import sys
 import socket
 import threading
 
 from enum import Enum
 from enum import unique
-
-
-@unique  # pylint: disable=too-few-public-methods
-class Action(Enum):
-    """
-    A enum class that contains both actions for each updatehub agent state.
-
-    :ENTER: action event triggered when the updatehub agent enters a state.
-    :LEAVE: action event triggered when the updatehub agent leaves a state.
-    """
-    ENTER = "enter"
-    LEAVE = "leave"
 
 
 @unique  # pylint: disable=too-few-public-methods
@@ -152,10 +138,10 @@ class StateChangeListener:
         if parts[0] == "error":
             raise StateError(" ".join(parts[1:]))
 
-        if len(parts) < 2:
+        if len(parts) < 1:
             raise MalformedState()
 
-        return parts[0], parts[1]
+        return parts[0]
 
     @classmethod
     def _readline(cls, conn):
@@ -177,16 +163,15 @@ class StateChangeListener:
         self.running = False
         self.thread = threading.Thread(target=self._loop)
 
-    def on_state_change(self, action, state, callback):
+    def on_state_change(self, state, callback):
         """
-        Adds a new callback method to a state change action.
+        Adds a new callback method to a state change.
 
-        :action: the monitored Action for this callback.
         :state: the monitored state for this callback.
         :callback: the method that will be called once a message containing the
-        action and the state is received by the listener.
+        state being entered is received by the listener.
         """
-        key = action.value + "_" + state.value
+        key = state.value
         if self.listeners.get(key) is None:
             self.listeners[key] = []
         self.listeners[key].append(callback)
@@ -207,8 +192,8 @@ class StateChangeListener:
         path (see the SDK_TRIGGER_FILENAME constante above).
         """
         if not os.path.isfile(StateChangeListener.SDK_TRIGGER_FILENAME):
-            print("updatehub-sdk-statechange-trigger not found!")
-            sys.exit()
+            print("WARNING: updatehub-sdk-statechange-trigger not found on",
+                  StateChangeListener.SDK_TRIGGER_FILENAME)
 
         self.running = True
         self.thread.start()
@@ -219,8 +204,11 @@ class StateChangeListener:
         close the Unix socket and wait for the thread to finish execution.
         """
         self.running = False
+        socket_path = os.getenv("UH_LISTENER_TEST",
+                                default=StateChangeListener.SOCKET_PATH)
+
         client = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-        client.connect(StateChangeListener.SOCKET_PATH)
+        client.connect(socket_path)
         client.close()
         if threading.current_thread() != self.thread:
             self.thread.join()
@@ -245,8 +233,8 @@ class StateChangeListener:
                 if not self.running:
                     break
                 line = self._readline(conn)
-                action, state = self._get_state(line)
-                self._emit(action, state, conn)
+                state = self._get_state(line)
+                self._emit(state, conn)
             except StateError as exception:
                 self._throw_error(exception, conn)
             finally:
@@ -254,18 +242,20 @@ class StateChangeListener:
                     conn.close()
 
     def _connect(self):
-        if os.path.exists(StateChangeListener.SOCKET_PATH):
-            os.remove(StateChangeListener.SOCKET_PATH)
+        socket_path = os.getenv("UH_LISTENER_TEST",
+                                default=StateChangeListener.SOCKET_PATH)
+
+        if os.path.exists(socket_path):
+            os.remove(socket_path)
 
         self.sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-        self.sock.bind(StateChangeListener.SOCKET_PATH)
+        self.sock.bind(socket_path)
         self.sock.listen(1)
 
-    def _emit(self, action, state, connection):
-        key = action + "_" + state
-        for callback in self.listeners.get(key) or []:
+    def _emit(self, state, connection):
+        for callback in self.listeners.get(state) or []:
             command = StateCommand(connection)
-            callback(action, state, command)
+            callback(state, command)
 
     def _throw_error(self, exception, connection):
         for callback in self.error_handlers:
