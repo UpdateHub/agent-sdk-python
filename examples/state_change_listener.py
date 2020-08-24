@@ -4,11 +4,8 @@ Sample script that cancels the update download action after receiving the
 "enter download" state.
 """
 
-from __future__ import print_function
-
 import signal
 import sys
-import time
 
 import updatehub.listener
 
@@ -21,11 +18,11 @@ def signal_handler(*args):  # pylint: disable=unused-argument
     sys.exit(0)
 
 
-def callback(action, state, command):
+def download_callback(state, command):
     """
     Callback that will be called after the "enter download" is received.
     """
-    print("CALLBACK: " + action + " " + state)
+    print("CALLBACK: " + state)
     print("Canceling the command...")
     command.cancel()
     print("Done!")
@@ -41,6 +38,16 @@ def error_callback(error_message, command):
     print("Done!")
 
 
+def rebooting_callback(state, _command):
+    """
+    Callback that will be called after the "enter download" is received.
+    """
+    print("CALLBACK: " + state)
+    print("Stopping listener...")
+    SCL.stop()
+    sys.exit(0)
+
+
 def main():
     """
     Main method. Instantiates a StateChangeListener, adds callbacks to the
@@ -49,15 +56,13 @@ def main():
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGQUIT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
-    SCL.on_state_change(updatehub.listener.Action.ENTER,
-                        updatehub.listener.State.DOWNLOADING,
-                        callback)
+    SCL.on_state_change(updatehub.listener.State.DOWNLOADING,
+                        download_callback)
+    SCL.on_state_change(updatehub.listener.State.REBOOTING,
+                        rebooting_callback)
     SCL.on_error(error_callback)
 
     SCL.start()
-
-    while True:
-        time.sleep(1)
 
 if __name__ == '__main__':
     main()

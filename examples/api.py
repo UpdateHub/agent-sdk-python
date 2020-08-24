@@ -24,6 +24,10 @@ def main():
     print(api.probe("http://www.example.com:8080"))
     print("")
     print(api.abort_download())
+    print("")
+    print(api.local_install("/tmp/update.uhu"))
+    print("")
+    print(api.remote_install("https://foo.bar/update.uhu"))
 
 
 if __name__ == '__main__':

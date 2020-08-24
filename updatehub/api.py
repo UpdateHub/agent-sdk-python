@@ -39,6 +39,14 @@ class Api:
     """
     Path to trigger a new probe for updates.
     """
+    LOCAL_INSTALL_PATH = "/local_install"
+    """
+    Path to trigger the installation of a local package.
+    """
+    REMOTE_INSTALL_PATH = "/remote_install"
+    """
+    Path to trigger the installation of a package from a direct URL.
+    """
     SERVER_URL = "http://localhost:8080"
     """
     URL to the agent API.
@@ -74,16 +82,28 @@ class Api:
         """
         return self._request('GET', self.__class__.LOG_PATH)
 
-    def probe(self, host=None, ignore_probe_asap=False):
+    def probe(self, host=None):
         """
         Initiate a probe looking for a new update.
         """
-        data = {}
+        data = None
         if host is not None:
-            data["server-address"] = host
-        if ignore_probe_asap is not False:
-            data["ignore-probe-asap"] = ignore_probe_asap
+            data = {"custom_server": host}
         return self._request('POST', self.__class__.PROBE_PATH, data)
+
+    def local_install(self, path):
+        """
+        Requests the agent to install a local package.
+        """
+        data = {"file": path}
+        return self._request('POST', self.__class__.LOCAL_INSTALL_PATH, data)
+
+    def remote_install(self, url):
+        """
+        Requests the agent to install a local package.
+        """
+        data = {"url": url}
+        return self._request('POST', self.__class__.REMOTE_INSTALL_PATH, data)
 
     def _get_uri(self, path):
         uri = urlparse(self.__class__.SERVER_URL)
@@ -92,19 +112,16 @@ class Api:
 
     def _request(self, method, path, data=None):
         uri = self._get_uri(path)
-
-        if method == 'POST':
-            if data is None:
-                data = {}
-            request_body = json.dumps(data)
+        headers = {}
+        if data is not None:
+            data = json.dumps(data)
             try:
-                request_body = request_body.encode('utf-8')
-                request = Request(uri, data=request_body)
+                data = data.encode('utf-8')
             except TypeError:
-                request = Request(uri, data=request_body)
-        else:
-            request = Request(uri)
-        request.add_header("Content-Type", "application/json")
+                pass
+            headers = {"Content-Type": "application/json"}
+
+        request = Request(uri, data=data, method=method, headers=headers)
         try:
             response = urlopen(request)
         except HTTPError as exception:
