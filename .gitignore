@@ -9,3 +9,4 @@ updatehub_agent_sdk.egg-info/
 test-report.xml
 *.pyc
 coverage.xml
+agent-http.yaml
