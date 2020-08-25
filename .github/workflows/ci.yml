@@ -22,7 +22,48 @@ jobs:
           python-version: ${{ matrix.python }}
       - name: Install Dependencies
         run: |
-          pip install tox coveralls
+          sudo apt-get update; sudo apt-get install socat
+          pip install tox
       - name: Run Tox
         run: tox -e py
+      - name: Run API test
+        run: |
+          wget https://raw.githubusercontent.com/UpdateHub/updatehub/master/doc/agent-http.yaml \
+            -O agent-http.yaml
+
+          docker run \
+            --rm \
+            --detach=true \
+            --name agent-sdk-python-mock \
+            -p 8080:8000 \
+            -v $PWD/agent-http.yaml:/api.yaml \
+            danielgtaylor/apisprout@sha256:6c07143937e57095d8478efc8ab7eab52b44e67c7673285f8c0a2bf4a7b137ad \
+            /api.yaml --validate-request
+
+            PYTHONPATH=. python examples/api.py
+      - name: Run listener test
+        run: |
+          export UH_LISTENER_TEST=updatehub-statechange.sock
+          PYTHONPATH=. python3.6 examples/state_change_listener.py &
+
+          while [ ! -S "$UH_LISTENER_TEST" ]; do
+            sleep 1
+          done
+
+          if [[ "$(echo "entry_point" | socat - UNIX-CONNECT:updatehub-statechange.sock)" != "" ]]; then
+            echo "Unexpected entry_point response"
+            exit 1
+          fi
+          if [[ "$(echo "downloading" | socat - UNIX-CONNECT:updatehub-statechange.sock)" != "cancel" ]]; then
+            echo "Unexpected downloading response"
+            exit 2
+          fi
+          if [[ "$(echo "error foo" | socat - UNIX-CONNECT:updatehub-statechange.sock)" != "try_again 10" ]]; then
+            echo "Unexpected error response"
+            exit 3
+          fi
+          if [[ "$(echo "rebooting" | socat - UNIX-CONNECT:updatehub-statechange.sock)" != "" ]]; then
+            echo "Unexpected rebooting response"
+            exit 4
+          fi
 
