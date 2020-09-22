@@ -56,9 +56,9 @@ def main():
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGQUIT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
-    SCL.on_state_change(updatehub.listener.State.DOWNLOADING,
+    SCL.on_state_change(updatehub.listener.State.DOWNLOAD,
                         download_callback)
-    SCL.on_state_change(updatehub.listener.State.REBOOTING,
+    SCL.on_state_change(updatehub.listener.State.REBOOT,
                         rebooting_callback)
     SCL.on_error(error_callback)
 

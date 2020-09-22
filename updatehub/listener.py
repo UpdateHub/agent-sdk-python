@@ -16,30 +16,18 @@ from enum import unique
 @unique  # pylint: disable=too-few-public-methods
 class State(Enum):
     """
-    A enum class that contains all states of the updatehub agent.
+    A enum class that contains all reported states of the updatehub agent.
 
-    :IDLE: triggered when the agent enters a idle state (doing nothing).
-    :POLL: triggered when the agent is waiting to probe the server for a new
-           update on the expected schedule.
-    :PROBE: triggered when the agent is probing the server for a new update.
-    :DOWNLOADING: triggered when the agent is downloading a new update.
-    :DOWNLOADED: triggered when the agent has finished downloading a new
-                 update.
-    :INSTALLING: triggered when the agent is installing a new update.
-    :INSTALLED: triggered when the agent has finished installing a new update.
-    :REBOOTING: triggered when the agent is rebooting the device.
-    :EXIT: triggered when the agent has finished execution and has exited.
+    :DOWNLOAD: triggered when the agent is about to start downloading
+               a new update.
+    :INSTALL: triggered when the agent is about to start installing
+               a new update.
+    :REBOOT: triggered when the agent is about to start rebooting the device.
     :ERROR: triggered when the agent has encountered an error.
     """
-    IDLE = "idle"
-    POLL = "poll"
-    PROBE = "probe"
-    DOWNLOADING = "downloading"
-    DOWNLOADED = "downloaded"
-    INSTALLING = "installing"
-    INSTALLED = "installed"
-    REBOOTING = "rebooting"
-    EXIT = "exit"
+    DOWNLOAD = "download"
+    INSTALL = "install"
+    REBOOT = "reboot"
     ERROR = "error"
 
 
