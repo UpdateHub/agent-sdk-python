@@ -54,16 +54,16 @@ jobs:
             echo "Unexpected entry_point response"
             exit 1
           fi
-          if [[ "$(echo "downloading" | socat - UNIX-CONNECT:updatehub-statechange.sock)" != "cancel" ]]; then
-            echo "Unexpected downloading response"
+          if [[ "$(echo "download" | socat - UNIX-CONNECT:updatehub-statechange.sock)" != "cancel" ]]; then
+            echo "Unexpected download response"
             exit 2
           fi
           if [[ "$(echo "error foo" | socat - UNIX-CONNECT:updatehub-statechange.sock)" != "try_again 10" ]]; then
             echo "Unexpected error response"
             exit 3
           fi
-          if [[ "$(echo "rebooting" | socat - UNIX-CONNECT:updatehub-statechange.sock)" != "" ]]; then
-            echo "Unexpected rebooting response"
+          if [[ "$(echo "reboot" | socat - UNIX-CONNECT:updatehub-statechange.sock)" != "" ]]; then
+            echo "Unexpected reboot response"
             exit 4
           fi
 
