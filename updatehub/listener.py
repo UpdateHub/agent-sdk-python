@@ -41,12 +41,6 @@ class StateCommand:
     The cancel command message to be sent back to the agent to stop whatever it
     is doing.
     """
-    TRY_AGAIN_MESSAGE = "try_again"
-    """
-    The try_again command message to be sent back to the agent to try again
-    something. This message is also accompanied by a delay integer, expressed
-    in seconds, which is a parameter for the try_again method (see bellow).
-    """
 
     def __init__(self, connection):
         """
@@ -61,19 +55,14 @@ class StateCommand:
         """
         Cancels the current action on the agent.
         """
-        self._send_message(StateCommand.CANCEL_MESSAGE)
+        self._connection.send(StateCommand.CANCEL_MESSAGE.encode())
 
-    def try_again(self, delay):
+    def proceed(self):
         """
-        Tell the agent to try the action again after some time.
-
-        :seconds: the time delay in seconds to try the action again.
+        Tell the agent to proceed with the transition.
         """
-        message = StateCommand.TRY_AGAIN_MESSAGE + " " + str(delay)
-        self._send_message(message)
-
-    def _send_message(self, message):
-        self._connection.send(message.encode())
+        # No message need to be sent to the connection in order to the
+        # agent to proceed handling the current state.
 
 
 class MalformedState(Exception):

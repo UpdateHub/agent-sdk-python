@@ -58,7 +58,7 @@ jobs:
             echo "Unexpected download response"
             exit 2
           fi
-          if [[ "$(echo "error foo" | socat - UNIX-CONNECT:updatehub-statechange.sock)" != "try_again 10" ]]; then
+          if [[ "$(echo "error foo" | socat - UNIX-CONNECT:updatehub-statechange.sock)" != "" ]]; then
             echo "Unexpected error response"
             exit 3
           fi

@@ -33,8 +33,7 @@ def error_callback(error_message, command):
     Callback to be called after receiving an error state.
     """
     print("ERROR: " + error_message)
-    print("Sending the command \"retry in 10 seconds\"...")
-    command.try_again(10)
+    command.proceed()
     print("Done!")
 
 
