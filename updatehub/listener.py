@@ -18,6 +18,8 @@ class State(Enum):
     """
     A enum class that contains all reported states of the updatehub agent.
 
+    :PROBE: triggered when the agent is about to start probing for a
+                update.
     :DOWNLOAD: triggered when the agent is about to start downloading
                a new update.
     :INSTALL: triggered when the agent is about to start installing
@@ -25,6 +27,7 @@ class State(Enum):
     :REBOOT: triggered when the agent is about to start rebooting the device.
     :ERROR: triggered when the agent has encountered an error.
     """
+    PROBE = "probe"
     DOWNLOAD = "download"
     INSTALL = "install"
     REBOOT = "reboot"
@@ -65,20 +68,7 @@ class StateCommand:
         # agent to proceed handling the current state.
 
 
-class MalformedState(Exception):
-    """
-    Exception class raised on errors of the communication protocol on the
-    socket.
-    """
-
-
-class StateError(Exception):
-    """
-    Exception class raised when receiving errors from the agent execution.
-    """
-
-
-class StateChangeListener:
+class StateChange:
     """
     Listener class for the agent. Objects from this class monitor a Unix socket
     that will receive data from the agent, and triggers registered callbacks
@@ -109,19 +99,7 @@ class StateChangeListener:
     """
 
     @classmethod
-    def _get_state(cls, line):
-        parts = line.split(' ')
-
-        if parts[0] == "error":
-            raise StateError(" ".join(parts[1:]))
-
-        if len(parts) < 1:
-            raise MalformedState()
-
-        return parts[0]
-
-    @classmethod
-    def _readline(cls, conn):
+    def _handle_connection(cls, conn):
         buff = io.BytesIO()
         while True:
             data = conn.recv(16)
@@ -134,13 +112,12 @@ class StateChangeListener:
         """
         Creates a new listener.
         """
-        self.error_handlers = []
         self.listeners = {}
         self.sock = None
         self.running = False
         self.thread = threading.Thread(target=self._loop)
 
-    def on_state_change(self, state, callback):
+    def on_state(self, state, callback):
         """
         Adds a new callback method to a state change.
 
@@ -153,24 +130,15 @@ class StateChangeListener:
             self.listeners[key] = []
         self.listeners[key].append(callback)
 
-    def on_error(self, callback):
-        """
-        Adds a new callback method to an error state.
-
-        :callback: the method that will be called once an error message is
-        received by the listener.
-        """
-        self.error_handlers.append(callback)
-
     def start(self):
         """
         Starts the listener. This method fails and exits the program if the
         updatehub-sdk-statechange-trigger program is not found at the expected
         path (see the SDK_TRIGGER_FILENAME constante above).
         """
-        if not os.path.isfile(StateChangeListener.SDK_TRIGGER_FILENAME):
+        if not os.path.isfile(StateChange.SDK_TRIGGER_FILENAME):
             print("WARNING: updatehub-sdk-statechange-trigger not found on",
-                  StateChangeListener.SDK_TRIGGER_FILENAME)
+                  StateChange.SDK_TRIGGER_FILENAME)
 
         self.running = True
         self.thread.start()
@@ -182,7 +150,7 @@ class StateChangeListener:
         """
         self.running = False
         socket_path = os.getenv("UH_LISTENER_TEST",
-                                default=StateChangeListener.SOCKET_PATH)
+                                default=StateChange.SOCKET_PATH)
 
         client = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         client.connect(socket_path)
@@ -209,18 +177,15 @@ class StateChangeListener:
                 conn = self.sock.accept()[0]
                 if not self.running:
                     break
-                line = self._readline(conn)
-                state = self._get_state(line)
-                self._emit(state, conn)
-            except StateError as exception:
-                self._throw_error(exception, conn)
+                line = self._handle_connection(conn)
+                self._emit(line, conn)
             finally:
                 if conn is not None:
                     conn.close()
 
     def _connect(self):
         socket_path = os.getenv("UH_LISTENER_TEST",
-                                default=StateChangeListener.SOCKET_PATH)
+                                default=StateChange.SOCKET_PATH)
 
         if os.path.exists(socket_path):
             os.remove(socket_path)
@@ -233,8 +198,3 @@ class StateChangeListener:
         for callback in self.listeners.get(state) or []:
             command = StateCommand(connection)
             callback(state, command)
-
-    def _throw_error(self, exception, connection):
-        for callback in self.error_handlers:
-            command = StateCommand(connection)
-            callback(str(exception), command)
