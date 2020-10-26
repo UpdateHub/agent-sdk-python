@@ -10,7 +10,7 @@ import sys
 import updatehub.listener
 
 
-SCL = updatehub.listener.StateChangeListener()
+SCL = updatehub.listener.StateChange()
 
 
 def signal_handler(*args):  # pylint: disable=unused-argument
@@ -18,48 +18,35 @@ def signal_handler(*args):  # pylint: disable=unused-argument
     sys.exit(0)
 
 
-def download_callback(state, command):
-    """
-    Callback that will be called after the "enter download" is received.
-    """
-    print("CALLBACK: " + state)
-    print("Canceling the command...")
-    command.cancel()
-    print("Done!")
+def download_callback(_state, handler):
+    print("function called when starting the Download state")
+    print("it will cancel the transition")
+    handler.cancel()
 
 
-def error_callback(error_message, command):
-    """
-    Callback to be called after receiving an error state.
-    """
-    print("ERROR: " + error_message)
-    command.proceed()
-    print("Done!")
+def install_callback(_state, handler):
+    print("function called when starting the Install state")
+    handler.proceed()
 
 
-def rebooting_callback(state, _command):
-    """
-    Callback that will be called after the "enter download" is received.
-    """
-    print("CALLBACK: " + state)
-    print("Stopping listener...")
+def rebooting_callback(_state, _handler):
+    print("function called when starting the reboot state")
     SCL.stop()
     sys.exit(0)
 
 
 def main():
     """
-    Main method. Instantiates a StateChangeListener, adds callbacks to the
-    "enter download" state and the error state and then starts the listener.
+    Main method. Instantiates a StateChange, adds callbacks to the
+    download state and the install state and then starts the listener.
     """
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGQUIT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
-    SCL.on_state_change(updatehub.listener.State.DOWNLOAD,
-                        download_callback)
-    SCL.on_state_change(updatehub.listener.State.REBOOT,
-                        rebooting_callback)
-    SCL.on_error(error_callback)
+
+    SCL.on_state(updatehub.listener.State.DOWNLOAD, download_callback)
+    SCL.on_state(updatehub.listener.State.INSTALL, install_callback)
+    SCL.on_state(updatehub.listener.State.REBOOT, rebooting_callback)
 
     SCL.start()
 
