@@ -8,7 +8,7 @@ For more information please access http://docs.updatehub.io/
 """
 
 
-__version__ = '1.0.1'
+__version__ = '2.0.0'
 
 
 def get_version():
