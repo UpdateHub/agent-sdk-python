@@ -15,6 +15,7 @@ setup(
     author='O.S. Systems Software LTDA',
     author_email='contato@ossystems.com.br',
     url='http://www.ossystems.com.br',
+    python_requires='>=3.5, <4',
     license='MIT',
     classifiers=[
         "License :: OSI Approved :: MIT License",
