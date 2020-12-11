@@ -29,7 +29,7 @@ it to check for any errors.
 
 ## Compatibility
 
-* Python 2.7.15
-* Python 3.4.8
-* Python 3.5.5
-* Python 3.6.5
+* Python 3.5
+* Python 3.6
+* Python 3.7
+* Python 3.8
