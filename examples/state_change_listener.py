@@ -23,6 +23,10 @@ def download_callback(_state, handler):
     print("it will cancel the transition")
     handler.cancel()
 
+def prepare_local_install_callback(_state, handler):
+    print("function called when starting the Prepare local install state")
+    print("it will cancel the transition")
+    handler.cancel()
 
 def install_callback(_state, handler):
     print("function called when starting the Install state")
@@ -38,13 +42,15 @@ def rebooting_callback(_state, _handler):
 def main():
     """
     Main method. Instantiates a StateChange, adds callbacks to the
-    download state and the install state and then starts the listener.
+    download state, prepare local install state, install state,
+    reboot state and then starts the listener.
     """
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGQUIT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
 
     SCL.on_state(updatehub.listener.State.DOWNLOAD, download_callback)
+    SCL.on_state(updatehub.listener.State.PREPARE_LOCAL_INSTALL, prepare_local_install_callback)
     SCL.on_state(updatehub.listener.State.INSTALL, install_callback)
     SCL.on_state(updatehub.listener.State.REBOOT, rebooting_callback)
 

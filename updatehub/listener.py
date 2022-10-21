@@ -29,6 +29,7 @@ class State(Enum):
     """
     PROBE = "probe"
     DOWNLOAD = "download"
+    PREPARE_LOCAL_INSTALL = "prepare_local_install"
     INSTALL = "install"
     REBOOT = "reboot"
     ERROR = "error"
